@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Brand design tokens — sampled from beauty.jpeg (blush/rose beauty ecommerce).
+  Tailwind v4: everything inside @theme generates utilities, e.g.
+  bg-blush-200, text-espresso-900, font-display.
+*/
+@theme {
+  /* Surfaces — warm cream, used for cards / product tiles */
+  --color-cream-50: #fffaf7;
+  --color-cream-100: #fdf3ef;
+  --color-cream-200: #f9e7e1;
+
+  /* Blush — page background and soft fills */
+  --color-blush-100: #fbece7;
+  --color-blush-200: #f7ded8;
+  --color-blush-300: #f0ccc5;
+  --color-blush-400: #e6b3ab;
+
+  /* Rose / mauve — CTAs, pills, arrows, sale accents */
+  --color-rose-300: #e9c4c1;
+  --color-rose-400: #d9a9a4;
+  --color-rose-500: #c79a95; /* primary button */
+  --color-rose-600: #b1837f; /* primary button hover */
+  --color-rose-700: #97706d;
+
+  /* Cocoa — dark surfaces (feature banners) */
+  --color-cocoa-500: #8a655c;
+  --color-cocoa-600: #6b4a41;
+  --color-cocoa-700: #563a33;
+
+  /* Text */
+  --color-espresso-900: #3a2724; /* headings */
+  --color-ink-700: #6b5450; /* secondary text */
+  --color-ink-500: #8a716b; /* muted body text */
+
+  /* Semantic aliases — prefer these in components */
+  --color-background: #fbece7;
+  --color-surface: #fffaf7;
+  --color-foreground: #3a2724;
+  --color-muted: #8a716b;
+  --color-primary: #c79a95;
+  --color-primary-hover: #b1837f;
+  --color-accent: #e9c4c1;
+  --color-border: #f0dcd6;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Light-only brand palette for now — a dark theme needs its own design pass. */
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-jost, ui-sans-serif, system-ui, sans-serif);
+  font-synthesis-weight: none;
+}
+
+/* ---- Type roles --------------------------------------------------------
+   Pairing: Playfair Display (elegant serif) for display/headings,
+   Jost (geometric sans) for UI, body and labels. */
+
+.type-hero {
+  font-family: var(--font-jost, sans-serif);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  color: var(--color-cream-50);
+}
+
+.type-heading {
+  font-family: var(--font-playfair, Georgia, serif);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--color-espresso-900);
+}
+
+.type-eyebrow {
+  font-family: var(--font-jost, sans-serif);
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-rose-700);
+}
+
+.type-body {
+  font-family: var(--font-jost, sans-serif);
+  font-weight: 400;
+  color: var(--color-ink-500);
+}
+
+/* ---- Brand primitives -------------------------------------------------- */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background-color: var(--color-rose-500);
+  color: var(--color-cream-50);
+  font-family: var(--font-jost, sans-serif);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
+  padding: 0.7rem 1.4rem;
+  transition: background-color 150ms ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-rose-600);
+}
+
+.card {
+  background-color: var(--color-cream-50);
+  border: 1px solid var(--color-border);
+  border-radius: 1.75rem;
+  box-shadow: 0 10px 30px -18px rgb(58 39 36 / 0.35);
 }
