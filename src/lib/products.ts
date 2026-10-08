@@ -21,7 +21,10 @@ export async function getCategories(): Promise<DbCategory[]> {
   return db.select().from(categories).orderBy(categories.sortOrder);
 }
 
-export function formatPrice(price: string | number): string {
-  const num = typeof price === "string" ? parseFloat(price) : price;
-  return `€ ${num.toFixed(2).replace(".", ",")}`;
+export async function getProductBySlug(slug: string): Promise<DbProduct | undefined> {
+  return db.query.products.findFirst({
+    where: eq(products.slug, slug),
+  });
 }
+
+export { formatPrice } from "./utils";

@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { ProductImage } from "@/components/ProductImage";
 import { useCartStore } from "@/lib/store/cart";
 import { toast } from "sonner";
-import { formatPrice, type DbProduct } from "@/lib/products";
+import { formatPrice } from "@/lib/utils";
+import type { DbProduct } from "@/lib/products";
 
 export function ProductCard({ product }: { product: DbProduct }) {
   const addItem = useCartStore((s) => s.addItem);
@@ -32,7 +34,10 @@ export function ProductCard({ product }: { product: DbProduct }) {
 
   return (
     <article className="card group overflow-hidden">
-      <div className="relative h-64 overflow-hidden rounded-t-[1.75rem] bg-blush-100">
+      <Link
+        href={`/shop/${product.slug}`}
+        className="relative block h-64 overflow-hidden rounded-t-[1.75rem] bg-blush-100"
+      >
         <ProductImage src={product.imageUrl || ""} alt={product.name} />
         {product.isFeatured && (
           <span className="absolute left-4 top-4 rounded-full bg-cocoa-600 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.15em] text-cream-50">
@@ -44,10 +49,17 @@ export function ProductCard({ product }: { product: DbProduct }) {
             Out of stock
           </span>
         )}
-      </div>
+      </Link>
       <div className="p-6">
         <p className="type-eyebrow text-[0.65rem]">{product.categoryId}</p>
-        <h3 className="type-heading mt-2 text-lg leading-snug">{product.name}</h3>
+        <h3 className="type-heading mt-2 text-lg leading-snug">
+          <Link
+            href={`/shop/${product.slug}`}
+            className="transition-colors hover:text-rose-600"
+          >
+            {product.name}
+          </Link>
+        </h3>
         <div className="mt-4 flex items-center justify-between">
           <p className="type-heading text-lg">{formatPrice(product.price)}</p>
           {outOfStock ? (
