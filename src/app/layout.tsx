@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Jost, Playfair_Display } from "next/font/google";
+import { Toaster } from "sonner";
+import { Header } from "@/components/Header";
 import "./globals.css";
 
 // Body / UI / labels — geometric sans (see globals.css @theme).
@@ -26,7 +28,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${jost.variable} ${playfair.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Header />
+        {children}
+        <Toaster position="bottom-right" richColors />
+      </body>
     </html>
   );
 }

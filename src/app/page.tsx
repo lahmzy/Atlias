@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { products } from "@/lib/data";
-import { ProductImage } from "@/components/ProductImage";
+import { ProductCard } from "@/components/ProductCard";
+import { getFeaturedProducts } from "@/lib/products";
 
 const stats = [
   { value: "25K+", label: "Happy Customers" },
@@ -17,8 +17,8 @@ const promises = [
   "Vegan & cruelty free",
 ];
 
-export default function Home() {
-  const featured = products.filter((p) => p.badge);
+export default async function Home() {
+  const featured = await getFeaturedProducts();
 
   return (
     <main className="flex flex-1 flex-col">
@@ -68,26 +68,7 @@ export default function Home() {
         </div>
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((product) => (
-            <article key={product.name} className="card group overflow-hidden">
-              <div className="relative h-64 overflow-hidden rounded-t-[1.75rem] bg-blush-100">
-                <ProductImage src={product.image} alt={product.name} />
-                {product.badge && (
-                  <span className="absolute left-4 top-4 rounded-full bg-cocoa-600 px-3 py-1 text-[0.65rem] font-medium uppercase tracking-[0.15em] text-cream-50">
-                    {product.badge}
-                  </span>
-                )}
-              </div>
-              <div className="p-6">
-                <p className="type-eyebrow text-[0.65rem]">{product.category}</p>
-                <h3 className="type-heading mt-2 text-lg leading-snug">{product.name}</h3>
-                <div className="mt-4 flex items-center justify-between">
-                  <p className="type-heading text-lg">{product.price}</p>
-                  <Link href="/shop" className="btn-primary px-4! py-2! text-[0.7rem]!">
-                    Add to cart
-                  </Link>
-                </div>
-              </div>
-            </article>
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
         <div className="mt-12 text-center">
