@@ -1,19 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 
 export function CheckoutGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    if (!isPending && !session) {
-      setShowModal(true);
-    }
-  }, [session, isPending]);
+  const [dismissedModal, setDismissedModal] = useState(false);
 
   if (isPending) {
     return (
@@ -30,7 +24,7 @@ export function CheckoutGuard({ children }: { children: React.ReactNode }) {
           <p className="type-body text-base">Please sign in to continue.</p>
         </div>
 
-        {showModal && (
+        {!dismissedModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-espresso-900/50 backdrop-blur-sm">
             <div className="card mx-4 w-full max-w-md p-8">
               <p className="type-eyebrow">Checkout</p>
@@ -55,7 +49,7 @@ export function CheckoutGuard({ children }: { children: React.ReactNode }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => setDismissedModal(true)}
                   className="type-body w-full pt-2 text-center text-sm text-ink-500 hover:text-espresso-900"
                 >
                   Continue as guest

@@ -1,21 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useSyncExternalStore } from "react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useCartStore } from "@/lib/store/cart";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+const emptySubscribe = () => () => {};
+
 export function Header() {
   const { data: session } = useSession();
   const router = useRouter();
   const items = useCartStore((s) => s.items);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Persisted cart state only exists on the client, so render the count after hydration.
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 

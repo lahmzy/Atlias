@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { ClearCartOnMount } from "@/components/ClearCartOnMount";
 
 export default function CheckoutSuccessPage() {
   return (
     <main className="flex flex-1 items-center justify-center px-6 py-20">
+      <ClearCartOnMount />
       <div className="text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-500">
           <svg

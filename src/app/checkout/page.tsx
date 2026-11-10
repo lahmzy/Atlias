@@ -1,57 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
-import { useCartStore } from "@/lib/store/cart";
 import { ProductImage } from "@/components/ProductImage";
 import { CheckoutGuard } from "@/components/CheckoutGuard";
+import { useCartStore } from "@/lib/store/cart";
+import { checkoutAction, type CheckoutState } from "./actions";
+
+const initialState: CheckoutState = { status: "idle" };
+
+const inputClass =
+  "w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none";
+
+const fieldErrorClass = "mt-1.5 text-sm text-rose-600";
 
 export default function CheckoutPage() {
-  const router = useRouter();
-  const { items, totalPrice, clearCart } = useCartStore();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const items = useCartStore((s) => s.items);
+  const [state, formAction, isPending] = useActionState(
+    checkoutAction,
+    initialState
+  );
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    address: "",
-    city: "",
-    postalCode: "",
-    country: "",
-  });
-
-  function updateField(field: string, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleCheckout() {
-    setError("");
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, shippingAddress: form }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong. Please try again.");
-        setLoading(false);
-        return;
-      }
-
-      clearCart();
-      router.push(data.url);
-    } catch {
-      setError("Network error. Please try again.");
-      setLoading(false);
+  useEffect(() => {
+    if (state.status === "success" && state.url) {
+      window.location.assign(state.url);
     }
-  }
+  }, [state]);
+
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  // Only IDs and quantities cross the boundary; the server re-reads prices and stock.
+  const cartPayload = JSON.stringify(
+    items.map(({ productId, quantity }) => ({ productId, quantity }))
+  );
 
   return (
     <CheckoutGuard>
@@ -67,78 +48,124 @@ export default function CheckoutPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-10 grid gap-10 lg:grid-cols-2">
+          <form
+            action={formAction}
+            onReset={(event) => event.preventDefault()}
+            className="mt-10 grid gap-10 lg:grid-cols-2"
+          >
+            <input type="hidden" name="items" value={cartPayload} />
+
             {/* Shipping form */}
             <div>
               <h2 className="type-heading text-2xl">Shipping details</h2>
               <div className="mt-6 space-y-4">
                 <div>
-                  <label className="type-body mb-2 block text-sm font-medium">Full name</label>
+                  <label htmlFor="name" className="type-body mb-2 block text-sm font-medium">
+                    Full name
+                  </label>
                   <input
+                    id="name"
+                    name="name"
                     type="text"
-                    required
-                    value={form.name}
-                    onChange={(e) => updateField("name", e.target.value)}
-                    className="w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none"
+                    autoComplete="name"
+                    defaultValue=""
+                    className={inputClass}
                     placeholder="Your name"
                   />
+                  {state.fieldErrors?.name && (
+                    <p className={fieldErrorClass}>{state.fieldErrors.name}</p>
+                  )}
                 </div>
+
                 <div>
-                  <label className="type-body mb-2 block text-sm font-medium">Email</label>
+                  <label htmlFor="email" className="type-body mb-2 block text-sm font-medium">
+                    Email
+                  </label>
                   <input
+                    id="email"
+                    name="email"
                     type="email"
-                    required
-                    value={form.email}
-                    onChange={(e) => updateField("email", e.target.value)}
-                    className="w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none"
+                    autoComplete="email"
+                    defaultValue=""
+                    className={inputClass}
                     placeholder="you@example.com"
                   />
+                  {state.fieldErrors?.email && (
+                    <p className={fieldErrorClass}>{state.fieldErrors.email}</p>
+                  )}
                 </div>
+
                 <div>
-                  <label className="type-body mb-2 block text-sm font-medium">Address</label>
+                  <label htmlFor="address" className="type-body mb-2 block text-sm font-medium">
+                    Address
+                  </label>
                   <input
+                    id="address"
+                    name="address"
                     type="text"
-                    required
-                    value={form.address}
-                    onChange={(e) => updateField("address", e.target.value)}
-                    className="w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none"
+                    autoComplete="street-address"
+                    defaultValue=""
+                    className={inputClass}
                     placeholder="Street address"
                   />
+                  {state.fieldErrors?.address && (
+                    <p className={fieldErrorClass}>{state.fieldErrors.address}</p>
+                  )}
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="type-body mb-2 block text-sm font-medium">City</label>
+                    <label htmlFor="city" className="type-body mb-2 block text-sm font-medium">
+                      City
+                    </label>
                     <input
+                      id="city"
+                      name="city"
                       type="text"
-                      required
-                      value={form.city}
-                      onChange={(e) => updateField("city", e.target.value)}
-                      className="w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none"
+                      autoComplete="address-level2"
+                      defaultValue=""
+                      className={inputClass}
                       placeholder="City"
                     />
+                    {state.fieldErrors?.city && (
+                      <p className={fieldErrorClass}>{state.fieldErrors.city}</p>
+                    )}
                   </div>
                   <div>
-                    <label className="type-body mb-2 block text-sm font-medium">Postal code</label>
+                    <label htmlFor="postalCode" className="type-body mb-2 block text-sm font-medium">
+                      Postal code
+                    </label>
                     <input
+                      id="postalCode"
+                      name="postalCode"
                       type="text"
-                      required
-                      value={form.postalCode}
-                      onChange={(e) => updateField("postalCode", e.target.value)}
-                      className="w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none"
+                      autoComplete="postal-code"
+                      defaultValue=""
+                      className={inputClass}
                       placeholder="12345"
                     />
+                    {state.fieldErrors?.postalCode && (
+                      <p className={fieldErrorClass}>{state.fieldErrors.postalCode}</p>
+                    )}
                   </div>
                 </div>
+
                 <div>
-                  <label className="type-body mb-2 block text-sm font-medium">Country</label>
+                  <label htmlFor="country" className="type-body mb-2 block text-sm font-medium">
+                    Country
+                  </label>
                   <input
+                    id="country"
+                    name="country"
                     type="text"
-                    required
-                    value={form.country}
-                    onChange={(e) => updateField("country", e.target.value)}
-                    className="w-full rounded-xl border border-rose-300 bg-cream-50 px-4 py-3 text-espresso-900 placeholder:text-ink-500/50 focus:border-rose-500 focus:outline-none"
+                    autoComplete="country-name"
+                    defaultValue=""
+                    className={inputClass}
                     placeholder="Country"
                   />
+                  {state.fieldErrors?.country && (
+                    <p className={fieldErrorClass}>{state.fieldErrors.country}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -157,7 +184,9 @@ export default function CheckoutPage() {
                         <p className="type-heading text-sm">{item.name}</p>
                         <p className="type-body text-xs">Qty: {item.quantity}</p>
                       </div>
-                      <p className="type-heading text-sm">€ {(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="type-heading text-sm">
+                        € {(item.price * item.quantity).toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -165,29 +194,28 @@ export default function CheckoutPage() {
               <div className="mt-6 border-t border-border pt-4">
                 <div className="flex items-center justify-between">
                   <p className="type-body text-base">Total</p>
-                  <p className="type-heading text-2xl">€ {totalPrice().toFixed(2)}</p>
+                  <p className="type-heading text-2xl">€ {total.toFixed(2)}</p>
                 </div>
               </div>
 
-              {error && (
+              {state.status === "error" && state.message && (
                 <div className="mt-4 rounded-xl border border-rose-400 bg-rose-300/20 px-4 py-3 text-sm text-espresso-900">
-                  {error}
+                  {state.message}
                 </div>
               )}
 
               <button
-                type="button"
-                onClick={handleCheckout}
-                disabled={loading}
+                type="submit"
+                disabled={isPending}
                 className="btn-primary mt-6 w-full justify-center py-3.5! text-sm! disabled:opacity-50"
               >
-                {loading ? "Redirecting to Stripe..." : "Pay with Stripe"}
+                {isPending ? "Redirecting to Stripe..." : "Pay with Stripe"}
               </button>
               <p className="type-body mt-3 text-center text-xs">
                 You will be redirected to Stripe to complete payment securely.
               </p>
             </div>
-          </div>
+          </form>
         )}
       </main>
     </CheckoutGuard>
