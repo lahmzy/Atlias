@@ -13,6 +13,11 @@
       "skillPath": "security/SKILL.md",
       "computedHash": "087c1094fa5f1834af4785c058dcc8c9abe4c1321b853883c76ea46c93a21cfe"
     },
+    "connect-recommend": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "9058862e1ca14718255fc10256e9585b6883bba7f08aaf6635d5eed2879c0673"
+    },
     "create-auth": {
       "source": "better-auth/skills",
       "sourceType": "github",
@@ -78,6 +83,11 @@
       "sourceType": "github",
       "skillPath": "better-auth/organization/SKILL.md",
       "computedHash": "f03e41bc2995c4fceec98f3db85f9638d71cc391fb10f9d85460304d6642efc2"
+    },
+    "stripe-docs": {
+      "source": "docs.stripe.com",
+      "sourceType": "well-known",
+      "computedHash": "ee4a51d34f11386fe6c9f991d5b2d32da69c851124a78a01403412bcf87e73d7"
     },
     "two-factor-authentication-best-practices": {
       "source": "better-auth/skills",

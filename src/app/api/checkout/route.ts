@@ -67,8 +67,6 @@ export async function POST(req: NextRequest) {
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
-      // @ts-expect-error Stripe SDK v23 type mismatch
-      payment_method_types: ["card"],
       line_items: items.map((item: { name: string; price: number; quantity: number; image: string }) => ({
         price_data: {
           currency: "eur",
